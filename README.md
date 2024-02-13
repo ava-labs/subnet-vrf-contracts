@@ -9,7 +9,7 @@ This repository provides **example** contracts for how an Avalanche Subnet could
 ### VRFProvider
 The `VRFProvider` contract is intended to be deployed on the same chain that Chainlink VRF is available on (i.e. the C-chain). It is configured to receive randomness requests from a specific `VRFProxy`, and passes those requests on to the Chainlink VRF coordinator. When the random values are provided by the Chainlink VRF coordinator, the `VRFProvider` in turn sends those values back to the `VRFProxy` that requested them via Teleporter.
 
-In order be able to successfully request random values from the configured Chainlink VRF coordinator, the `VRFProvider` must be added to a [VRF subscription as an allowed consumer](https://docs.chain.link/vrf/v2/subscription/ui). The specific subsciption ID to be used is set by each randomness request.
+In order be able to successfully request random values from the configured Chainlink VRF coordinator, the `VRFProvider` must be added to a [VRF subscription as an allowed consumer](https://docs.chain.link/vrf/v2/subscription/ui). The `VRFProvider` contract exclusively uses the [subscription method](https://docs.chain.link/vrf/v2/subscription) for paying fees the randomness requests.
 
 ### VRFProxy
 The `VRFProxy` contract is intended to be deployed on any Subnet chain that would like to leverage Chainlink VRF but does not have a direct VRF integration. It is configured to request values from a specific `VRFProvider` that is deployed on another chain via Teleporter. It provides the same `requestRandomWords` interface as Chainlink VRF coordinators, and returns random values to fulfill requests via the same `fulfillRandomWords` method used by Chainlink VRF consumers.
@@ -20,7 +20,10 @@ In order to be able to request random values from a `VRFProxy`, accounts must be
 A sample contract demostrating the use of VRF. Implements a simple betting game that leverages a `VRFProxy` to fulfill random values.
 
 ## Dependencies
-In order to build and deploy the contracts using the scripts in this repository, [Foundry](https://book.getfoundry.sh/getting-started/installation) is required.
+In order to build and deploy the contracts using the scripts in this repository, [Foundry](https://book.getfoundry.sh/getting-started/installation) is required. It can be installed using:
+```bash
+./scripts/install_foundry.sh
+```
 
 ## Building and Testing
 The contracts in this repository can be built and tested using the following scripts.
@@ -40,7 +43,11 @@ Included in the unit test script is a test coverage report.
 ```
 
 ## Deploying
-The example contracts can be deployed by setting proper environment variable values as follows.
+The example contracts can be deployed by running.
+```bash
+./scripts/deploy.sh
+```
+The deployment script requires setting proper environment variable values in the `.env`. This can be done using:
 ```bash
 cp .env.example .env
 ```
@@ -57,3 +64,31 @@ The `user_private_key` value then must be set in the `.env` file. The full list 
 | subnet_blockchain_id | Blockchain ID of the Subnet chain to be used (hexadecimal encoded) |
 | subnet_teleporter_registry_address | Teleporter registry contract used by the `VRFProvider` on the Subnet chain |
 | user_private_key | Private key for a funded account on both the C-chain and Subnet chain. Used to deploy contracts |
+
+## Interacting
+Once the contracts are deployed to their respective blockchains, an example flow to properly interact with them is as follows:
+
+1. Adding the `VRFProvider` contract as an [allowed consumer of the Chainlink VRF subscription](https://vrf.chain.link/fuji) used by the contracts on the C-chain.
+2. Adding the `SimpleBettingGame` contract as an allowed consumer of the `VRFProxy` contract on the Subnet. For example:
+```
+cast send <vrf_proxy_contract_address> "addConsumer(address)" <simple_betting_game_contract_address> --rpc-url <subnet_url> --private-key <user_private_key>
+```
+3. Placing and taking bets! Done by calling `proposeBet` and `takeBet` functions of the `SimpleBettingGame` contract.
+
+Example instances of the three contracts have been deployed and configured at the following addresses on the [Fuji C-chain](https://subnets-test.avax.network/c-chain) and [Dispatch Subnet](https://subnets-test.avax.network/dispatch).
+
+* [`VRFProvider` on the C-chain](https://subnets-test.avax.network/c-chain/address/0xD4f913752656B9524CC990Cb7e870725ad973b85)
+* [`VRFProxy` on Dispatch](https://subnets-test.avax.network/dispatch/address/0xa9AD48aA93FC58dA65f8F4048656594Abbfa229A)
+* [`SimpleBettingGame` on Dispatch](https://subnets-test.avax.network/dispatch/address/0x743B2500deB292FE55D293339272E5CAE214A4d1)
+
+Bets can be placed and taken on Dispatch using the following commands. Note that bets must be taken from a different account than they were placed by.
+```bash
+Place Bet:
+
+cast send 0x743B2500deB292FE55D293339272E5CAE214A4d1 "proposeNewBet(uint32)(uint256)" <max_value> --rpc-url https://subnets.avax.network/dispatch/testnet/rpc --private-key <user_private_key>
+
+Take Bet:
+
+cast send 0x743B2500deB292FE55D293339272E5CAE214A4d1 "takeBet(uint256)" <bet_id> --rpc-url https://subnets.avax.network/dispatch/testnet/rpc --private-key <user_private_key>
+
+```
