@@ -1,0 +1,44 @@
+name: Soldity Linter
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  solhint:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 2
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install solhint
+        run: |
+          npm install solhint -g
+          solhint --version
+
+      - name: Run Linter
+        run: ./scripts/lint.sh --sol-lint
+
+  format-solidity:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 2
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        run: ./scripts/install_foundry.sh
+      
+      - name: Check Solidity Formatting
+        run: |
+          export PATH=$PATH:$HOME/.foundry/bin
+          ./scripts/lint.sh --sol-format-check
