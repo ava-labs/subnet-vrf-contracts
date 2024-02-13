@@ -5,7 +5,7 @@ This repository provides **example** contracts for how an Avalanche Subnet could
 **The contracts in this repository are not audited and are not suitable for production use.**
 
 ## Contracts
-There are 2 primary contracts (`VRFProxy` and `VRFProvider`) that enable the use of VRF on Subnets. There is also `SimpleBettingGame` is included to demostrate possible usage of VRF.
+There are 2 primary contracts (`VRFProxy` and `VRFProvider`) that enable the use of VRF on Subnets. This repository also includes a `SimpleBettingGame` contract to demostrate possible usage of VRF.
 
 
 <div align="center">
