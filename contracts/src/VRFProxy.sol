@@ -37,7 +37,7 @@ contract VRFProxy is IVRFProxy, ReentrancyGuard, TeleporterOwnerUpgradeable {
      * @dev The estimated amount of gas used by the VRFProvider on the partner chain to request random values from the
      * Chainlink VRF coordinator. This is the required gas limit for the Teleporter message sent to request the values.
      */
-    uint256 public constant VRF_REQUEST_REQUIRED_GAS = 100_000;
+    uint256 public constant VRF_REQUEST_REQUIRED_GAS = 500_000;
 
     /**
      * @dev The blockchain ID of the partner blockchain where the VRFProvider contract is deployed.

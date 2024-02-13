@@ -66,9 +66,9 @@ contract VRFProvider is VRFConsumerBaseV2, TeleporterOwnerUpgradeable, Reentranc
      * @dev Gas limits for receiving random words from the Chainlink VRF coordinator, and sending
      * them in a Teleporter message to the partner Teleporter VRF coordinator contract.
      */
-    uint32 public constant TELEPORTER_CALLBACK_GAS_LIMIT_BASE = 100_000;
-    uint32 public constant TELEPORTER_CALLBACK_GAS_LIMIT_PER_WORD = 1_000;
-    uint32 public constant TELEPORTER_RECEIVE_MESSAGE_GAS_OVERHEAD = 20_000;
+    uint32 public constant TELEPORTER_CALLBACK_GAS_LIMIT_BASE = 300_000;
+    uint32 public constant TELEPORTER_CALLBACK_GAS_LIMIT_PER_WORD = 5_000;
+    uint32 public constant TELEPORTER_RECEIVE_MESSAGE_GAS_OVERHEAD = 300_000;
 
     /**
      * @dev Emitted when a message is received from the partner VRFProxy requesting random values.

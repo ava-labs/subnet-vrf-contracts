@@ -76,7 +76,7 @@ contract SimpleBettingGame is VRFConsumerBaseV2, ReentrancyGuard {
     IVRFProxy internal immutable _vrfCoordinator;
     uint64 public immutable vrfSubscriptionID;
     bytes32 public immutable vrfKeyHash;
-    uint32 public constant VRF_CALLBACK_GAS_LIMIT = 100_000;
+    uint32 public constant VRF_CALLBACK_GAS_LIMIT = 200_000;
     uint32 public constant MAX_VALUE = 100;
 
     /**
