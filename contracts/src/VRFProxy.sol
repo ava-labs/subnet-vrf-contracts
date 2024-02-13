@@ -116,6 +116,7 @@ contract VRFProxy is IVRFProxy, ReentrancyGuard, TeleporterOwnerUpgradeable {
     constructor(address teleporterRegistryAddress_, bytes32 vrfProviderBlockchainID_, address vrfProviderAddress_)
         TeleporterOwnerUpgradeable(teleporterRegistryAddress_)
     {
+        require(vrfProviderAddress_ != address(0), "VRFProxy: zero VRF provider address");
         vrfProviderBlockchainID = vrfProviderBlockchainID_;
         vrfProviderAddress = vrfProviderAddress_;
     }
@@ -162,7 +163,7 @@ contract VRFProxy is IVRFProxy, ReentrancyGuard, TeleporterOwnerUpgradeable {
         uint16 minimumRequestConfirmations,
         uint32 callbackGasLimit,
         uint32 numWords
-    ) external returns (uint256) {
+    ) external nonReentrant returns (uint256) {
         require(allowedConsumers[msg.sender], "VRFProxy: unauthorized consumer");
 
         // Assign the next nonce to be used at the request ID.

@@ -6,6 +6,7 @@ pragma solidity 0.8.18;
 
 import {VRFConsumerBaseV2} from "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 import {IVRFProxy} from "./IVRFProxy.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /**
  * THIS IS AN EXAMPLE CONTRACT THAT USES UNAUDITED CODE.
@@ -53,7 +54,7 @@ struct Bet {
  * the outcome of the bet. When the random value is provided via fulfillRandomWords, the winner
  * of the bet is determined.
  */
-contract SimpleBettingGame is VRFConsumerBaseV2 {
+contract SimpleBettingGame is VRFConsumerBaseV2, ReentrancyGuard {
     /**
      * @dev Total number of bets proposed. Used as bet IDs.
      */
@@ -127,7 +128,7 @@ contract SimpleBettingGame is VRFConsumerBaseV2 {
      * maximum value the VRF can provide such that the proposer will win the bet.
      * Emits BetProposed.
      */
-    function proposeNewBet(uint32 maxValue) external returns (uint256) {
+    function proposeNewBet(uint32 maxValue) external nonReentrant returns (uint256) {
         // The max value must be between 0 and UINT256_MAX, exclusive.
         require(maxValue > 1 && maxValue < MAX_VALUE, "SimpleBettingGame: invalid maxValue");
 
@@ -153,7 +154,7 @@ contract SimpleBettingGame is VRFConsumerBaseV2 {
      * be canceled.
      * Emits BetCanceled.
      */
-    function cancelBet(uint256 betID) external {
+    function cancelBet(uint256 betID) external nonReentrant {
         // Get the given bet, and check that it can be canceled by the caller.
         require(betID != 0 && betID <= betNonce, "SimpleBettingGame: invalid betID");
         Bet memory bet = _bets[betID];
@@ -173,7 +174,7 @@ contract SimpleBettingGame is VRFConsumerBaseV2 {
      * from the VRF in order to determine the outcome of the bet.
      * Emits BetTaken.
      */
-    function takeBet(uint256 betID) external {
+    function takeBet(uint256 betID) external nonReentrant {
         require(betID != 0 && betID <= betNonce, "SimpleBettingGame: invalid betID");
         Bet memory bet = _bets[betID];
         require(bet.status == BetStatus.PROPOSED, "SimpleBettingGame: can only take proposed bets");
@@ -214,7 +215,7 @@ contract SimpleBettingGame is VRFConsumerBaseV2 {
      */
     // Need to provide an implementation of fulfillRandomWords (without a leading "_") for VRFConsumerBaseV2
     // solhint-disable-next-line
-    function fulfillRandomWords(uint256 vrfRequestID, uint256[] memory randomWords) internal override {
+    function fulfillRandomWords(uint256 vrfRequestID, uint256[] memory randomWords) internal override nonReentrant {
         require(randomWords.length == 1, "SimpleBettingGame: invalid random words length");
         _handleResult(vrfRequestID, randomWords[0]);
     }

@@ -93,11 +93,12 @@ contract VRFProvider is VRFConsumerBaseV2, TeleporterOwnerUpgradeable, Reentranc
 
     constructor(
         address teleporterRegistryAddress_,
-        address chainlinkVRFCoordinator_,
+        address chainlinkVRFCoordinatorAddress_,
         bytes32 vrfProxyBlockchainID_,
         address vrfProxyAddress_
-    ) TeleporterOwnerUpgradeable(teleporterRegistryAddress_) VRFConsumerBaseV2(chainlinkVRFCoordinator_) {
-        _chainlinkVRFCoordinator = VRFCoordinatorV2Interface(chainlinkVRFCoordinator_);
+    ) TeleporterOwnerUpgradeable(teleporterRegistryAddress_) VRFConsumerBaseV2(chainlinkVRFCoordinatorAddress_) {
+        require(vrfProxyAddress_ != address(0), "VRFProvider: zero VRF proxy address");
+        _chainlinkVRFCoordinator = VRFCoordinatorV2Interface(chainlinkVRFCoordinatorAddress_);
         vrfProxyBlockchainID = vrfProxyBlockchainID_;
         vrfProxyAddress = vrfProxyAddress_;
     }
@@ -112,7 +113,11 @@ contract VRFProvider is VRFConsumerBaseV2, TeleporterOwnerUpgradeable, Reentranc
      */
     // Need to provide an implementation of fulfillRandomWords (without a leading "_") for VRFConsumerBaseV2
     // solhint-disable-next-line
-    function fulfillRandomWords(uint256 chainlinkVRFRequestID, uint256[] memory randomWords) internal override {
+    function fulfillRandomWords(uint256 chainlinkVRFRequestID, uint256[] memory randomWords)
+        internal
+        override
+        nonReentrant
+    {
         // Look up the corresponding VRFProxy request info for this chainlinkVRFRequestID to know
         // the correct data to include in the response.
         InternalRequestInfo memory requestInfo = _requests[chainlinkVRFRequestID];
