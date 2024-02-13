@@ -5,6 +5,12 @@ This repository provides **example** contracts for how an Avalanche Subnet could
 **The contracts in this repository are not audited and are not suitable for production use.**
 
 ## Contracts
+There are 2 primary contracts (`VRFProxy` and `VRFProvider`) that enable the use of VRF on Subnets. There is also `SimpleBettingGame` is included to demostrate possible usage of VRF.
+
+
+<div align="center">
+  <img src="images/data_flow_diagram.png"/>
+</div>
 
 ### VRFProvider
 The `VRFProvider` contract is intended to be deployed on the same chain that Chainlink VRF is available on (i.e. the C-chain). It is configured to receive randomness requests from a specific `VRFProxy`, and passes those requests on to the Chainlink VRF coordinator. When the random values are provided by the Chainlink VRF coordinator, the `VRFProvider` in turn sends those values back to the `VRFProxy` that requested them via Teleporter.
@@ -18,6 +24,9 @@ In order to be able to request random values from a `VRFProxy`, accounts must be
 
 ### SimpleBettingGame
 A sample contract demostrating the use of VRF. Implements a simple betting game that leverages a `VRFProxy` to fulfill random values.
+
+## VRF Application Contract Compatibility
+Any contracts currently using Chainlink VRF to request random values on the C-chain should also be directly compatible with the `VRFProxy` contract. The `VRFProxy` implements the same `requestRandomWords` interface method of `VRFCoordinatorV2`, so no changes should be needed.
 
 ## Dependencies
 In order to build and deploy the contracts using the scripts in this repository, [Foundry](https://book.getfoundry.sh/getting-started/installation) is required. It can be installed using:
