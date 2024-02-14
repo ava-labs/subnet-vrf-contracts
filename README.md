@@ -101,3 +101,14 @@ Take Bet:
 cast send 0xF800569A4dD2E0FE214c30469Edf1aAa1373bc82 "takeBet(uint256)" <bet_id> --rpc-url https://subnets.avax.network/dispatch/testnet/rpc --private-key <user_private_key>
 
 ```
+
+## Considerations and Limitations
+Using a VRF provider on a different chain introduces a handful of side effects that should be considered by applications. Notably, getting a random value requires up to 4 transactions:
+1. Sending the randomness request from the Subnet to the VRF provider chain.
+2. Receiving the request on the VRF provider chain, and submitting it to the VRF service.
+3. Fulfilling the random value on the VRF provider chain, and sending it back to the requesting Subnet.
+4. Receiving the random value on the Subnet.
+
+The resulting random value is committed and published on the VRF provider chain in transaction 3 above, which creates a period of time when the value is known but not yet delivered to the requesting Subnet or contract. If there are second order effects that the delivery of the value will have, these effects can be front-run by others sending transactions on the Subnet prior to the random value being delivered.
+
+A more optimtal VRF implementation could include a source of randomness provided within the virtual machine such that a single transaction is able to atomically get and use random values.
