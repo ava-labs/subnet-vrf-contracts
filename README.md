@@ -86,18 +86,18 @@ cast send <vrf_proxy_contract_address> "addConsumer(address)" <simple_betting_ga
 
 Example instances of the three contracts have been deployed and configured at the following addresses on the [Fuji C-Chain](https://subnets-test.avax.network/c-chain) and [Dispatch Subnet](https://subnets-test.avax.network/dispatch).
 
-* [`VRFProvider` on the C-Chain](https://subnets-test.avax.network/c-chain/address/0xD4f913752656B9524CC990Cb7e870725ad973b85)
-* [`VRFProxy` on Dispatch](https://subnets-test.avax.network/dispatch/address/0xa9AD48aA93FC58dA65f8F4048656594Abbfa229A)
-* [`SimpleBettingGame` on Dispatch](https://subnets-test.avax.network/dispatch/address/0x743B2500deB292FE55D293339272E5CAE214A4d1)
+* [`VRFProvider` on the C-Chain](https://subnets-test.avax.network/c-chain/address/0x08bBe2Dc39c450803AE27A29c1Ec7494EF41aeF1)
+* [`VRFProxy` on Dispatch](https://subnets-test.avax.network/dispatch/address/0x067606899F55eC607D689929FB643f86DE10D513)
+* [`SimpleBettingGame` on Dispatch](https://subnets-test.avax.network/dispatch/address/0xF800569A4dD2E0FE214c30469Edf1aAa1373bc82)
 
 Bets can be placed and taken on Dispatch using the following commands. Note that bets must be taken from a different account than they were placed by.
 ```bash
 Place Bet:
 
-cast send 0x743B2500deB292FE55D293339272E5CAE214A4d1 "proposeNewBet(uint32)(uint256)" <max_value> --rpc-url https://subnets.avax.network/dispatch/testnet/rpc --private-key <user_private_key>
+cast send 0xF800569A4dD2E0FE214c30469Edf1aAa1373bc82 "proposeNewBet(uint32)(uint256)" <max_value> --rpc-url https://subnets.avax.network/dispatch/testnet/rpc --private-key <user_private_key>
 
 Take Bet:
 
-cast send 0x743B2500deB292FE55D293339272E5CAE214A4d1 "takeBet(uint256)" <bet_id> --rpc-url https://subnets.avax.network/dispatch/testnet/rpc --private-key <user_private_key>
+cast send 0xF800569A4dD2E0FE214c30469Edf1aAa1373bc82 "takeBet(uint256)" <bet_id> --rpc-url https://subnets.avax.network/dispatch/testnet/rpc --private-key <user_private_key>
 
 ```
