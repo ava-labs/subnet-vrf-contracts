@@ -9,7 +9,6 @@ import {
     TeleporterMessageInput, TeleporterFeeInfo
 } from "@teleporter/contracts/src/Teleporter/ITeleporterMessenger.sol";
 import {TeleporterOwnerUpgradeable} from "@teleporter/contracts/src/Teleporter/upgrades/TeleporterOwnerUpgradeable.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {VRFConsumerBaseV2} from "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 import {VRFCoordinatorV2Interface} from "@chainlink/contracts/src/v0.8/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
@@ -30,7 +29,7 @@ import {VRFCoordinatorV2Interface} from "@chainlink/contracts/src/v0.8/vrf/inter
  * to pay for the request. The partner VRFProxy contract and all of its allowed consumers are able to use any
  * subscription ID the VRFProvider has access to.
  */
-contract VRFProvider is VRFConsumerBaseV2, TeleporterOwnerUpgradeable, ReentrancyGuard {
+contract VRFProvider is VRFConsumerBaseV2, TeleporterOwnerUpgradeable {
     /**
      * @dev  The components of VRFRequestInfo that need to be persisted when requesting
      * random values from the Chainlink VRF coordinator. These values will be sent
@@ -96,7 +95,10 @@ contract VRFProvider is VRFConsumerBaseV2, TeleporterOwnerUpgradeable, Reentranc
         address chainlinkVRFCoordinatorAddress_,
         bytes32 vrfProxyBlockchainID_,
         address vrfProxyAddress_
-    ) TeleporterOwnerUpgradeable(teleporterRegistryAddress_) VRFConsumerBaseV2(chainlinkVRFCoordinatorAddress_) {
+    )
+        TeleporterOwnerUpgradeable(teleporterRegistryAddress_, msg.sender)
+        VRFConsumerBaseV2(chainlinkVRFCoordinatorAddress_)
+    {
         require(vrfProxyAddress_ != address(0), "VRFProvider: zero VRF proxy address");
         _chainlinkVRFCoordinator = VRFCoordinatorV2Interface(chainlinkVRFCoordinatorAddress_);
         vrfProxyBlockchainID = vrfProxyBlockchainID_;
@@ -155,7 +157,6 @@ contract VRFProvider is VRFConsumerBaseV2, TeleporterOwnerUpgradeable, Reentranc
     function _receiveTeleporterMessage(bytes32 sourceBlockchainID, address originSenderAddress, bytes memory message)
         internal
         override
-        nonReentrant
     {
         // Verify the sender.
         require(sourceBlockchainID == vrfProxyBlockchainID, "VRFProvider: invalid source blockchain ID");

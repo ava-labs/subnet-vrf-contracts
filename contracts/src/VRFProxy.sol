@@ -9,7 +9,6 @@ import {
     TeleporterMessageInput, TeleporterFeeInfo
 } from "@teleporter/contracts/src/Teleporter/ITeleporterMessenger.sol";
 import {TeleporterOwnerUpgradeable} from "@teleporter/contracts/src/Teleporter/upgrades/TeleporterOwnerUpgradeable.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {VRFConsumerBaseV2} from "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 import {GasUtils} from "./GasUtils.sol";
 
@@ -30,7 +29,7 @@ import {GasUtils} from "./GasUtils.sol";
  * random values from a Chainlink VRF coordinator on that blockchain. All allowed consumers of the VRFProxy are
  * capable of using VRF subscriptions available to the VRFProvider contract on the partner chain.
  */
-contract VRFProxy is IVRFProxy, ReentrancyGuard, TeleporterOwnerUpgradeable {
+contract VRFProxy is IVRFProxy, TeleporterOwnerUpgradeable {
     using GasUtils for *;
 
     /**
@@ -114,7 +113,7 @@ contract VRFProxy is IVRFProxy, ReentrancyGuard, TeleporterOwnerUpgradeable {
     event RandomWordsFulfilled(uint256 indexed requestID, bool success);
 
     constructor(address teleporterRegistryAddress_, bytes32 vrfProviderBlockchainID_, address vrfProviderAddress_)
-        TeleporterOwnerUpgradeable(teleporterRegistryAddress_)
+        TeleporterOwnerUpgradeable(teleporterRegistryAddress_, msg.sender)
     {
         require(vrfProviderAddress_ != address(0), "VRFProxy: zero VRF provider address");
         vrfProviderBlockchainID = vrfProviderBlockchainID_;
@@ -219,7 +218,6 @@ contract VRFProxy is IVRFProxy, ReentrancyGuard, TeleporterOwnerUpgradeable {
     function _receiveTeleporterMessage(bytes32 sourceBlockchainID, address originSenderAddress, bytes memory message)
         internal
         override
-        nonReentrant
     {
         // Verify the sender.
         require(sourceBlockchainID == vrfProviderBlockchainID, "VRFProxy: invalid source blockchain ID");

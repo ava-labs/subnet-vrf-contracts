@@ -1,4 +1,4 @@
 @chainlink/=lib/chainlink/
-@openzeppelin/=lib/openzeppelin-contracts/
+@openzeppelin/contracts@4.8.1/=lib/openzeppelin-contracts/contracts/
 @teleporter/=lib/teleporter/
-@subnet-evm-contracts/=lib/teleporter/contracts/lib/subnet-evm/contracts/contracts/
+@avalabs/subnet-evm-contracts@1.2.0/=lib/teleporter/contracts/lib/subnet-evm/contracts/
