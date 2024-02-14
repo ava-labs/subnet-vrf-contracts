@@ -1,6 +1,6 @@
 # Subnet VRF Contracts
 
-This repository provides **example** contracts for how an Avalanche Subnet could leverage [Chainlink VRF](https://docs.chain.link/vrf) functionality (available on the C-chain) using [Teleporter](https://github.com/ava-labs/teleporter). This allows newly launched Subnets to immediately utilize VRF without any trusted intermediaries or third-party integration requirements.
+This repository provides **example** contracts for how an Avalanche Subnet could leverage [Chainlink VRF](https://docs.chain.link/vrf) functionality (available on the C-Chain) using [Teleporter](https://github.com/ava-labs/teleporter). This allows newly launched Subnets to immediately utilize VRF without any trusted intermediaries or third-party integration requirements.
 
 **The contracts in this repository are not audited and are not suitable for production use.**
 
@@ -13,7 +13,7 @@ There are 2 primary contracts (`VRFProxy` and `VRFProvider`) that enable the use
 </div>
 
 ### VRFProvider
-The `VRFProvider` contract is intended to be deployed on the same chain that Chainlink VRF is available on (i.e. the C-chain). It is configured to receive randomness requests from a specific `VRFProxy`, and passes those requests on to the Chainlink VRF coordinator. When the random values are provided by the Chainlink VRF coordinator, the `VRFProvider` in turn sends those values back to the `VRFProxy` that requested them via Teleporter.
+The `VRFProvider` contract is intended to be deployed on the same chain that Chainlink VRF is available on (i.e. the C-Chain). It is configured to receive randomness requests from a specific `VRFProxy`, and passes those requests on to the Chainlink VRF coordinator. When the random values are provided by the Chainlink VRF coordinator, the `VRFProvider` in turn sends those values back to the `VRFProxy` that requested them via Teleporter.
 
 In order be able to successfully request random values from the configured Chainlink VRF coordinator, the `VRFProvider` must be added to a [VRF subscription as an allowed consumer](https://docs.chain.link/vrf/v2/subscription/ui). The `VRFProvider` contract exclusively uses the [subscription method](https://docs.chain.link/vrf/v2/subscription) for paying fees the randomness requests.
 
@@ -26,7 +26,7 @@ In order to be able to request random values from a `VRFProxy`, accounts must be
 A sample contract demostrating the use of VRF. Implements a simple betting game that leverages a `VRFProxy` to fulfill random values.
 
 ## VRF Application Contract Compatibility
-Any contracts currently using Chainlink VRF to request random values on the C-chain should also be directly compatible with the `VRFProxy` contract. The `VRFProxy` implements the same `requestRandomWords` interface method of `VRFCoordinatorV2`, so no changes should be needed.
+Any contracts currently using Chainlink VRF to request random values on the C-Chain should also be directly compatible with the `VRFProxy` contract. The `VRFProxy` implements the same `requestRandomWords` interface method of `VRFCoordinatorV2`, so no changes should be needed.
 
 ## Dependencies
 In order to build and deploy the contracts using the scripts in this repository, [Foundry](https://book.getfoundry.sh/getting-started/installation) is required. It can be installed using:
@@ -63,30 +63,30 @@ cp .env.example .env
 The `user_private_key` value then must be set in the `.env` file. The full list of configurable environment variables includes:
 | Environment Variable | Description |
 |--------|--------|
-| c_chain_url | RPC endpoint for the C-chain (where Chainlink VRF is available) |
-| c_chain_blockchain_id | Blockchain ID of the C-chain (hexadecimal encoded) |
-| c_chain_teleporter_registry_address | Teleporter registry contract used by the `VRFProvider` on the C-chain | 
+| c_chain_url | RPC endpoint for the C-Chain (where Chainlink VRF is available) |
+| c_chain_blockchain_id | Blockchain ID of the C-Chain (hexadecimal encoded) |
+| c_chain_teleporter_registry_address | Teleporter registry contract used by the `VRFProvider` on the C-Chain | 
 | c_chain_vrf_coordinator_address | Address of the Chainlink VRF Coordinator to be used by the `VRFProvider` |
 | c_chain_vrf_subscription_id | The Chainlink VRF subscription ID to be used by the `VRFProxy` |
 | c_chain_vrf_key_hash | The Chainlink VRF key hash to be used by the `VRFProxy` |
 | subnet_url | RPC endpoint for the Subnet chain to be used|
 | subnet_blockchain_id | Blockchain ID of the Subnet chain to be used (hexadecimal encoded) |
 | subnet_teleporter_registry_address | Teleporter registry contract used by the `VRFProvider` on the Subnet chain |
-| user_private_key | Private key for a funded account on both the C-chain and Subnet chain. Used to deploy contracts |
+| user_private_key | Private key for a funded account on both the C-Chain and Subnet chain. Used to deploy contracts |
 
 ## Interacting
 Once the contracts are deployed to their respective blockchains, an example flow to properly interact with them is as follows:
 
-1. Adding the `VRFProvider` contract as an [allowed consumer of the Chainlink VRF subscription](https://vrf.chain.link/fuji) used by the contracts on the C-chain.
+1. Adding the `VRFProvider` contract as an [allowed consumer of the Chainlink VRF subscription](https://vrf.chain.link/fuji) used by the contracts on the C-Chain.
 2. Adding the `SimpleBettingGame` contract as an allowed consumer of the `VRFProxy` contract on the Subnet. For example:
 ```
 cast send <vrf_proxy_contract_address> "addConsumer(address)" <simple_betting_game_contract_address> --rpc-url <subnet_url> --private-key <user_private_key>
 ```
 3. Placing and taking bets! Done by calling `proposeBet` and `takeBet` functions of the `SimpleBettingGame` contract.
 
-Example instances of the three contracts have been deployed and configured at the following addresses on the [Fuji C-chain](https://subnets-test.avax.network/c-chain) and [Dispatch Subnet](https://subnets-test.avax.network/dispatch).
+Example instances of the three contracts have been deployed and configured at the following addresses on the [Fuji C-Chain](https://subnets-test.avax.network/c-chain) and [Dispatch Subnet](https://subnets-test.avax.network/dispatch).
 
-* [`VRFProvider` on the C-chain](https://subnets-test.avax.network/c-chain/address/0xD4f913752656B9524CC990Cb7e870725ad973b85)
+* [`VRFProvider` on the C-Chain](https://subnets-test.avax.network/c-chain/address/0xD4f913752656B9524CC990Cb7e870725ad973b85)
 * [`VRFProxy` on Dispatch](https://subnets-test.avax.network/dispatch/address/0xa9AD48aA93FC58dA65f8F4048656594Abbfa229A)
 * [`SimpleBettingGame` on Dispatch](https://subnets-test.avax.network/dispatch/address/0x743B2500deB292FE55D293339272E5CAE214A4d1)
 
