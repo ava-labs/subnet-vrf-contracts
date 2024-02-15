@@ -103,12 +103,14 @@ cast send 0xF800569A4dD2E0FE214c30469Edf1aAa1373bc82 "takeBet(uint256)" <bet_id>
 ```
 
 ## Considerations and Limitations
-Using a VRF provider on a different chain introduces a handful of side effects that should be considered by applications. Notably, getting a random value requires up to 4 transactions:
+In cases where an application uses a VRF provider on the same chain it is deployed on, it requires up to 2 transactions: one to request the random value and a second to fulfill it. When the second of these transactions is submitted to the mempool, the resulting random value is publicly known. If there are second order effects that the delivery of the value will have, these effects can be front-run by anyone listening to the mempool prior to when the fulfillment transaction is included in a block.
+
+Using a VRF provider on a different chain increases the number of transactions required to get a random value up to as many as four:
 1. Sending the randomness request from the Subnet to the VRF provider chain.
 2. Receiving the request on the VRF provider chain, and submitting it to the VRF service.
 3. Fulfilling the random value on the VRF provider chain, and sending it back to the requesting Subnet.
 4. Receiving the random value on the Subnet.
 
-The resulting random value is committed and published on the VRF provider chain in transaction 3 above, which creates a period of time when the value is known but not yet delivered to the requesting Subnet or contract. If there are second order effects that the delivery of the value will have, these effects can be front-run by others sending transactions on the Subnet prior to the random value being delivered.
+The same opportunity to front-run effects of delivering the random values in this model exists from when transaction number 3 above is submitted to the mempool on the VRF the provider chain to when transaction number 4 included in a block on the Subnet. 
 
-A more optimtal VRF implementation could include a source of randomness provided within the virtual machine such that a single transaction is able to atomically get and use random values.
+Application developers leveraging VRF in either set up should consider these side effects. A more optimtal VRF implementation could include a source of randomness provided within the virtual machine such that a single transaction is able to atomically get and use random values.
